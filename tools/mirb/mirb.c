@@ -61,7 +61,7 @@ is_code_block_open(struct mrb_parser_state *parser)
     break;
   case EXPR_END:
     /* an expression was ended */
-    code_block_open = -1;
+    code_block_open = 0;
     break;
   case EXPR_ENDARG:
     /* closing parenthese */
@@ -221,7 +221,7 @@ main(void)
         /* no evaluation of code */
       }
       else {
-        if (0 < parser->nerr) {
+        if (FALSE) {//0 < parser->nerr) {
           /* syntax error */
           printf("%s\n", parser->error_buffer[0].message);
         }
