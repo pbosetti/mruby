@@ -91,7 +91,7 @@ parse_args(mrb_state *mrb, int argc, char **argv, struct _args *args)
     case '-':
       if (strcmp((*argv) + 2, "version") == 0) {
         mrb_show_version(mrb);
-	exit(0);
+        exit(0);
       }
       else if (strcmp((*argv) + 2, "verbose") == 0) {
         args->verbose = 1;
@@ -99,7 +99,7 @@ parse_args(mrb_state *mrb, int argc, char **argv, struct _args *args)
       }
       else if (strcmp((*argv) + 2, "copyright") == 0) {
         mrb_show_copyright(mrb);
-	exit(0);
+        exit(0);
       }
       else return -3;
       return 0;
@@ -158,9 +158,9 @@ main(int argc, char **argv)
     else {
       p = mrb_parser_new(mrb);
       if (p) {
-	mrb_parser_filename(p, argv[1]);
-	p->f = args.rfp;
-	mrb_parser_parse(p);
+        mrb_parser_filename(p, argv[1]);
+        p->f = args.rfp;
+        mrb_parser_parse(p);
       }
     }
     if (!p || !p->tree || p->nerr) {

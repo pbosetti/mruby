@@ -158,7 +158,7 @@ main(void)
   mrb_value mrb_return_value;
   int byte_code;
   int code_block_open = FALSE;
-
+  
   print_hint();
 
   /* new interpreter instance */ 
@@ -221,7 +221,7 @@ main(void)
           /* syntax error */
           printf("%s\n", parser->error_buffer[0].message);
         }
-	else {
+	      else {
           /* generate bytecode */
           byte_code = mrb_generate_code(mrb_interpreter, parser->tree);
 
@@ -235,7 +235,7 @@ main(void)
             mrb_p(mrb_interpreter, mrb_obj_value(mrb_interpreter->exc));
             mrb_interpreter->exc = 0;
           }
-	  else {
+	        else {
             /* no */
             printf(" => ");
             mrb_p(mrb_interpreter, mrb_return_value);
