@@ -18,7 +18,7 @@
 int
 is_code_block_open(struct mrb_parser_state *parser)
 {
-  int code_block_open = FALSE;
+  int code_block_open = 0;
 
   switch (parser->lstate) {
 
@@ -27,32 +27,32 @@ is_code_block_open(struct mrb_parser_state *parser)
   case EXPR_BEG:
     /* an expression was just started, */
     /* we can't end it like this */
-    code_block_open = TRUE;
+    code_block_open = 1;
     break;
   case EXPR_DOT:
     /* a message dot was the last token, */
     /* there has to come more */
-    code_block_open = TRUE;
+    code_block_open = 1;
     break;
   case EXPR_CLASS:
     /* a class keyword is not enough! */
     /* we need also a name of the class */
-    code_block_open = TRUE;
+    code_block_open = 1;
     break;
   case EXPR_FNAME:
     /* a method name is necessary */
-    code_block_open = TRUE;
+    code_block_open = 1;
     break;
   case EXPR_VALUE:
     /* if, elsif, etc. without condition */
-    code_block_open = TRUE;
+    code_block_open = 1;
     break;
 
   /* now all the states which are closed */
 
   case EXPR_ARG:
     /* an argument is the last token */
-    code_block_open = FALSE;
+    code_block_open = 1;
     break;
 
   /* all states which are unsure */
@@ -61,12 +61,15 @@ is_code_block_open(struct mrb_parser_state *parser)
     break;
   case EXPR_END:
     /* an expression was ended */
+    code_block_open = 0;
     break;
   case EXPR_ENDARG:
     /* closing parenthese */
+    code_block_open = -1;
     break;
   case EXPR_ENDFN:
     /* definition end */
+    code_block_open = -1;
     break;
   case EXPR_MID:
     /* jump keyword like break, return, ... */
@@ -124,8 +127,10 @@ is_code_block_open(struct mrb_parser_state *parser)
     /* last parser state suggest that this code */
     /* block is open, WE NEED MORE CODE!! */
   }
-
-  return code_block_open;
+  if (code_block_open < 0)
+    return 0;
+  else
+    return code_block_open;
 }
 
 /* Print a short remark for the user */
@@ -184,7 +189,7 @@ main(void)
     last_code_line[char_index] = '\0';
 
     if (strcmp(last_code_line, "exit") == 0) {
-      if (code_block_open) {
+      if (code_block_open > 0) {
         /* cancel the current block and reset */
         code_block_open = FALSE;
         memset(ruby_code, 0, sizeof(*ruby_code));
@@ -197,7 +202,7 @@ main(void)
       }
     }
     else {
-      if (code_block_open) {
+      if (code_block_open > 0) {
         strcat(ruby_code, "\n");
         strcat(ruby_code, last_code_line);
       }
@@ -212,8 +217,8 @@ main(void)
       parser->capture_errors = 1;
       mrb_parser_parse(parser);
       code_block_open = is_code_block_open(parser); 
-
-      if (code_block_open) {
+      printf("lstate: %d(%d)", parser->lstate, code_block_open);
+      if (code_block_open > 0) {
         /* no evaluation of code */
       }
       else {
