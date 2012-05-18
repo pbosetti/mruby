@@ -52,7 +52,7 @@ is_code_block_open(struct mrb_parser_state *parser)
 
   case EXPR_ARG:
     /* an argument is the last token */
-    code_block_open = 1;
+    code_block_open = 0;
     break;
 
   /* all states which are unsure */
@@ -61,7 +61,7 @@ is_code_block_open(struct mrb_parser_state *parser)
     break;
   case EXPR_END:
     /* an expression was ended */
-    code_block_open = 0;
+    code_block_open = -1;
     break;
   case EXPR_ENDARG:
     /* closing parenthese */
@@ -82,7 +82,7 @@ is_code_block_open(struct mrb_parser_state *parser)
     break;
   }
 
-  if (!code_block_open) {
+  if (code_block_open > 0) {
     /* based on the last parser state the code */
     /* block seems to be closed */
 
@@ -95,31 +95,31 @@ is_code_block_open(struct mrb_parser_state *parser)
 
       if (strcmp(parser->error_buffer[0].message,
           "syntax error, unexpected $end, expecting ';' or '\\n'") == 0) {
-        code_block_open = TRUE;
+        code_block_open = 1;
       }
       else if (strcmp(parser->error_buffer[0].message,
           "syntax error, unexpected $end, expecting keyword_end") == 0) {
-        code_block_open = TRUE;
+        code_block_open = 1;
       }
       else if (strcmp(parser->error_buffer[0].message,
           "syntax error, unexpected $end, expecting '<' or ';' or '\\n'") == 0) {
-        code_block_open = TRUE;
+        code_block_open = 1;
       }
       else if (strcmp(parser->error_buffer[0].message,
           "syntax error, unexpected keyword_end") == 0) {
-        code_block_open = TRUE;
+        code_block_open = 1;
       }
       else if (strcmp(parser->error_buffer[0].message,
           "syntax error, unexpected $end, expecting keyword_then or ';' or '\\n'") == 0) {
-        code_block_open = TRUE;
+        code_block_open = 1;
       }
       else if (strcmp(parser->error_buffer[0].message,
           "syntax error, unexpected tREGEXP_BEG") == 0) {
-        code_block_open = TRUE;
+        code_block_open = 1;
       }
       else if (strcmp(parser->error_buffer[0].message,
           "unterminated string meets end of file") == 0) {
-        code_block_open = TRUE;
+        code_block_open = 1;
       }
     }
   }
@@ -127,10 +127,7 @@ is_code_block_open(struct mrb_parser_state *parser)
     /* last parser state suggest that this code */
     /* block is open, WE NEED MORE CODE!! */
   }
-  if (code_block_open < 0)
-    return 0;
-  else
-    return code_block_open;
+  return code_block_open;
 }
 
 /* Print a short remark for the user */
@@ -216,7 +213,9 @@ main(void)
       parser->send = ruby_code + strlen(ruby_code);
       parser->capture_errors = 1;
       mrb_parser_parse(parser);
-      code_block_open = is_code_block_open(parser); 
+      code_block_open += is_code_block_open(parser);
+      if (code_block_open < 0)
+        code_block_open = 0;      
       printf("lstate: %d(%d)", parser->lstate, code_block_open);
       if (code_block_open > 0) {
         /* no evaluation of code */
