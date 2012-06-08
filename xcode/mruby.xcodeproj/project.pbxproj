@@ -96,6 +96,9 @@
 		88760B9D1576A37600113BFB /* mruby.h in Headers */ = {isa = PBXBuildFile; fileRef = 88BF356A156C99B200F12AC7 /* mruby.h */; };
 		88760B9F1576A4A200113BFB /* mrblib.c in Sources */ = {isa = PBXBuildFile; fileRef = 88760B1C15769CEE00113BFB /* mrblib.c */; };
 		88760BA01576A4A700113BFB /* libmruby_core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 88760B1715769BE400113BFB /* libmruby_core.a */; };
+		88C19DB4157D7AC3002ABAEA /* serialport.c in Sources */ = {isa = PBXBuildFile; fileRef = 88C19DB3157D7AC3002ABAEA /* serialport.c */; };
+		88C19DB71582C17E002ABAEA /* posix_serialport_impl.c in Sources */ = {isa = PBXBuildFile; fileRef = 88C19DB61582C17E002ABAEA /* posix_serialport_impl.c */; };
+		88C19DB91582C312002ABAEA /* win_serialport_impl.c in Sources */ = {isa = PBXBuildFile; fileRef = 88C19DB81582C312002ABAEA /* win_serialport_impl.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -312,6 +315,10 @@
 		88BF3589156C99C200F12AC7 /* range.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = range.rb; sourceTree = "<group>"; };
 		88BF358A156C99C200F12AC7 /* string.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = string.rb; sourceTree = "<group>"; };
 		88BF358B156C99C200F12AC7 /* struct.rb */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.ruby; path = struct.rb; sourceTree = "<group>"; };
+		88C19DB3157D7AC3002ABAEA /* serialport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = serialport.c; sourceTree = "<group>"; };
+		88C19DB5157D7AED002ABAEA /* serialport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = serialport.h; sourceTree = "<group>"; };
+		88C19DB61582C17E002ABAEA /* posix_serialport_impl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = posix_serialport_impl.c; sourceTree = "<group>"; };
+		88C19DB81582C312002ABAEA /* win_serialport_impl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = win_serialport_impl.c; sourceTree = "<group>"; };
 		88EDC30215757CB40098CF0D /* y.tab.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = y.tab.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -578,6 +585,10 @@
 				88BF350F156C998200F12AC7 /* time.c */,
 				88BF3515156C998200F12AC7 /* variable.c */,
 				88BF3518156C998200F12AC7 /* vm.c */,
+				88C19DB3157D7AC3002ABAEA /* serialport.c */,
+				88C19DB5157D7AED002ABAEA /* serialport.h */,
+				88C19DB61582C17E002ABAEA /* posix_serialport_impl.c */,
+				88C19DB81582C312002ABAEA /* win_serialport_impl.c */,
 			);
 			name = src;
 			path = ../src;
@@ -1007,6 +1018,9 @@
 				88760B1015759F9700113BFB /* time.c in Sources */,
 				88760B1515759F9700113BFB /* variable.c in Sources */,
 				88760B1615759F9700113BFB /* vm.c in Sources */,
+				88C19DB4157D7AC3002ABAEA /* serialport.c in Sources */,
+				88C19DB71582C17E002ABAEA /* posix_serialport_impl.c in Sources */,
+				88C19DB91582C312002ABAEA /* win_serialport_impl.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1488,6 +1502,7 @@
 				88C19D97157D7594002ABAEA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
