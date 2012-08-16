@@ -1,0 +1,5 @@
+---
+auto: true
+markdown: rdiscount
+server: true
+listing_limit: 10
