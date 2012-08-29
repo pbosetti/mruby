@@ -164,6 +164,9 @@ void
 mrb_exc_raise(mrb_state *mrb, mrb_value exc)
 {
     mrb->exc = (struct RObject*)mrb_object(exc);
+    if (!mrb->jmp) {
+      abort();
+    }
     longjmp(*(jmp_buf*)mrb->jmp, 1);
 }
 
@@ -277,7 +280,7 @@ sysexit_status(mrb_state *mrb, mrb_value err)
 static void
 set_backtrace(mrb_state *mrb, mrb_value info, mrb_value bt)
 {
-        mrb_funcall(mrb, info, "set_backtrace", 1, bt);
+  mrb_funcall(mrb, info, "set_backtrace", 1, bt);
 }
 
 mrb_value

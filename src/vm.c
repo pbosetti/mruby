@@ -1,5 +1,5 @@
 /*
-** vm.c - virtual machine for mruby (RiteVM)
+** vm.c - virtual machine for mruby
 **
 ** See Copyright Notice in mruby.h
 */
@@ -267,7 +267,12 @@ mrb_funcall_with_block(mrb_state *mrb, mrb_value self, mrb_sym mid, int argc, mr
   ci->stackidx = mrb->stack - mrb->stbase;
   ci->argc = argc;
   ci->target_class = p->target_class;
-  ci->nregs = argc + 2;
+  if (MRB_PROC_CFUNC_P(p)) {
+    ci->nregs = argc + 2;
+  }
+  else {
+    ci->nregs = p->body.irep->nregs + 2;
+  }
   ci->acc = -1;
   mrb->stack = mrb->stack + n;
 
@@ -287,7 +292,7 @@ mrb_funcall_with_block(mrb_state *mrb, mrb_value self, mrb_sym mid, int argc, mr
     val = p->body.func(mrb, self);
     mrb->arena_idx = ai;
     mrb_gc_protect(mrb, val);
-    mrb->stack = mrb->stbase + ci->stackidx;
+    mrb->stack = mrb->stbase + mrb->ci->stackidx;
     cipop(mrb);
   }
   else {
@@ -318,7 +323,12 @@ mrb_yield_internal(mrb_state *mrb, mrb_value b, int argc, mrb_value *argv, mrb_v
   ci->stackidx = mrb->stack - mrb->stbase;
   ci->argc = argc;
   ci->target_class = c;
-  ci->nregs = argc + 2;
+  if (MRB_PROC_CFUNC_P(p)) {
+    ci->nregs = argc + 2;
+  }
+  else {
+    ci->nregs = p->body.irep->nregs + 2;
+  }
   ci->acc = -1;
   mrb->stack = mrb->stack + n;
 
@@ -331,7 +341,7 @@ mrb_yield_internal(mrb_state *mrb, mrb_value b, int argc, mrb_value *argv, mrb_v
 
   if (MRB_PROC_CFUNC_P(p)) {
     val = p->body.func(mrb, self);
-    mrb->stack = mrb->stbase + ci->stackidx;
+    mrb->stack = mrb->stbase + mrb->ci->stackidx;
     cipop(mrb);
   }
   else {
@@ -772,7 +782,7 @@ mrb_run(mrb_state *mrb, struct RProc *proc, mrb_value self)
         mrb->arena_idx = ai;
         if (mrb->exc) goto L_RAISE;
         /* pop stackpos */
-        regs = mrb->stack = mrb->stbase + ci->stackidx;
+        regs = mrb->stack = mrb->stbase + mrb->ci->stackidx;
         cipop(mrb);
         NEXT;
       }
@@ -830,7 +840,7 @@ mrb_run(mrb_state *mrb, struct RProc *proc, mrb_value self)
         mrb->arena_idx = ai;
         if (mrb->exc) goto L_RAISE;
         /* pop stackpos */
-        regs = mrb->stack = mrb->stbase + ci->stackidx;
+        regs = mrb->stack = mrb->stbase + mrb->ci->stackidx;
         cipop(mrb);
         NEXT;
       }
@@ -903,7 +913,7 @@ mrb_run(mrb_state *mrb, struct RProc *proc, mrb_value self)
         mrb->arena_idx = ai;
         if (mrb->exc) goto L_RAISE;
         /* pop stackpos */
-        regs = mrb->stack = mrb->stbase + ci->stackidx;
+        regs = mrb->stack = mrb->stbase + mrb->ci->stackidx;
         cipop(mrb);
         NEXT;
       }
@@ -1619,7 +1629,7 @@ mrb_run(mrb_state *mrb, struct RProc *proc, mrb_value self)
         mrb->arena_idx = ai;
         if (mrb->exc) goto L_RAISE;
         /* pop stackpos */
-        regs = mrb->stack = mrb->stbase + ci->stackidx;
+        regs = mrb->stack = mrb->stbase + mrb->ci->stackidx;
         cipop(mrb);
         NEXT;
       }

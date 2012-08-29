@@ -708,7 +708,7 @@ const_get(mrb_state *mrb, struct RClass *base, mrb_sym sym)
   while (c) {
     if (mrb_respond_to(mrb, mrb_obj_value(c), cm)) {
       mrb_value name = mrb_symbol_value(sym);
-      return mrb_funcall(mrb, mrb_obj_value(c), "const_missing", 1, name);
+      return mrb_funcall_argv(mrb, mrb_obj_value(c), cm, 1, &name);
     }
     c = c->super;
   }
@@ -747,13 +747,13 @@ mrb_vm_const_set(mrb_state *mrb, mrb_sym sym, mrb_value v)
   struct RClass *c = mrb->ci->proc->target_class;
 
   if (!c) c = mrb->ci->target_class;
-  mrb_iv_set(mrb, mrb_obj_value(c), sym, v);
+  mrb_obj_iv_set(mrb, (struct RObject*)c, sym, v);
 }
 
 void
 mrb_define_const(mrb_state *mrb, struct RClass *mod, const char *name, mrb_value v)
 {
-  mrb_iv_set(mrb, mrb_obj_value(mod), mrb_intern(mrb, name), v);
+  mrb_obj_iv_set(mrb, (struct RObject*)mod, mrb_intern(mrb, name), v);
 }
 
 void
