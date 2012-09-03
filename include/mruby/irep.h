@@ -21,6 +21,10 @@ typedef struct mrb_irep {
   mrb_value *pool;
   mrb_sym *syms;
 
+  /* debug info */
+  const char *filename;
+  short *lines;
+
   int ilen, plen, slen;
 } mrb_irep;
 

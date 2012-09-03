@@ -699,7 +699,7 @@ mrb_fixnum_mul(mrb_state *mrb, mrb_value x, mrb_value y)
     if (FIT_SQRT_INT(a) && FIT_SQRT_INT(b))
       return mrb_fixnum_value(a*b);
     c = a * b;
-    if (c/a != b) {
+    if (a != 0 && c/a != b) {
       return mrb_float_value((mrb_float)a*(mrb_float)b);
     }
     return mrb_fixnum_value(c);;
@@ -1306,6 +1306,7 @@ mrb_init_numeric(mrb_state *mrb)
   mrb_define_method(mrb, fixnum,  "to_f",     fix_to_f,          ARGS_NONE()); /* 15.2.8.3.23 */
   mrb_define_method(mrb, fixnum,  "to_i",     int_to_i,          ARGS_NONE()); /* 15.2.8.3.24 */
   mrb_define_method(mrb, fixnum,  "to_s",     fix_to_s,          ARGS_NONE()); /* 15.2.8.3.25 */
+  mrb_define_method(mrb, fixnum,  "inspect",  fix_to_s,          ARGS_NONE());
   mrb_define_method(mrb, fixnum,  "truncate", int_to_i,          ARGS_NONE()); /* 15.2.8.3.26 */
   mrb_define_method(mrb, fixnum,  "divmod",   fix_divmod,        ARGS_REQ(1)); /* 15.2.8.3.30 (x) */
 
@@ -1327,4 +1328,5 @@ mrb_init_numeric(mrb_state *mrb)
   mrb_define_method(mrb, fl,      "truncate",  flo_truncate,     ARGS_NONE()); /* 15.2.9.3.15 */
 
   mrb_define_method(mrb, fl,      "to_s",      flo_to_s,         ARGS_NONE()); /* 15.2.9.3.16(x) */
+  mrb_define_method(mrb, fl,      "inspect",   flo_to_s,         ARGS_NONE());
 }

@@ -2916,7 +2916,7 @@ opt_terms	: /* none */
 		;
 
 opt_nl		: /* none */
-		| '\n'
+		| nl
 		;
 
 rparen		: opt_nl ')'
@@ -2926,13 +2926,19 @@ rbracket	: opt_nl ']'
 		;
 
 trailer		: /* none */
-		| '\n'
+		| nl
 		| ','
 		;
 
 term		: ';' {yyerrok;}
-		| '\n'
+		| nl
 		;
+
+nl		: '\n'
+		    {
+		      p->lineno++;
+		      p->column = 0;
+		    }
 
 terms		: term
 		| terms ';' {yyerrok;}
@@ -3515,14 +3521,14 @@ parser_yylex(parser_state *p)
     skip(p, '\n');
     /* fall through */
   case '\n':
-    p->lineno++;
-    p->column = 0;
     switch (p->lstate) {
     case EXPR_BEG:
     case EXPR_FNAME:
     case EXPR_DOT:
     case EXPR_CLASS:
     case EXPR_VALUE:
+      p->lineno++;
+      p->column = 0;
       goto retry;
     default:
       break;
@@ -4783,7 +4789,6 @@ void
 mrbc_context_free(mrb_state *mrb, mrbc_context *cxt)
 {
   mrb_free(mrb, cxt->syms);
-  mrb_free(mrb, cxt->filename);
   mrb_free(mrb, cxt);
 }
 
@@ -4792,10 +4797,9 @@ mrbc_filename(mrb_state *mrb, mrbc_context *c, const char *s)
 {
   if (s) {
     int len = strlen(s);
-    char *p = (char *)mrb_malloc(mrb, len + 1);
+    char *p = (char *)mrb_alloca(mrb, len + 1);
 
     memcpy(p, s, len + 1);
-    if (c->filename) mrb_free(mrb, c->filename);
     c->filename = p;
     c->lineno = 1;
   }
@@ -5169,10 +5173,11 @@ parser_dump(mrb_state *mrb, node *tree, int offset)
       if (n2  && (n2->car || n2->cdr)) {
 	dump_prefix(offset+1);
 	printf("local variables:\n");
+	dump_prefix(offset+2);
 	while (n2) {
 	  if (n2->car) {
-	    dump_prefix(offset+2);
-	    printf("%s ", mrb_sym2name(mrb, (mrb_sym)n2->car));
+	    if (n2 != tree->car) printf(", ");
+	    printf("%s", mrb_sym2name(mrb, (mrb_sym)n2->car));
 	  }
 	  n2 = n2->cdr;
 	}
@@ -5514,11 +5519,11 @@ parser_dump(mrb_state *mrb, node *tree, int offset)
       if (n2 && (n2->car || n2->cdr)) {
 	dump_prefix(offset+1);
 	printf("local variables:\n");
-
+	dump_prefix(offset+2);
 	while (n2) {
 	  if (n2->car) {
-	    dump_prefix(offset+2);
-	    printf("%s ", mrb_sym2name(mrb, (mrb_sym)n2->car));
+	    if (n2 != tree->car) printf(", ");
+	    printf("%s", mrb_sym2name(mrb, (mrb_sym)n2->car));
 	  }
 	  n2 = n2->cdr;
 	}
