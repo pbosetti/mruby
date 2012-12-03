@@ -5,7 +5,7 @@
 ** an interactive way and executes it
 ** immediately. It's a REPL...
 */
- 
+
 #include <string.h>
 
 #include <mruby.h>
@@ -143,7 +143,9 @@ print_cmdline(int code_block_open)
 int
 main(void)
 {
-  char last_char, ruby_code[1024], last_code_line[1024];
+  int last_char;
+  char ruby_code[1024] = { 0 };
+  char last_code_line[1024] = { 0 };
   int char_index;
   mrbc_context *cxt;
   struct mrb_parser_state *parser;
@@ -154,7 +156,7 @@ main(void)
 
   print_hint();
 
-  /* new interpreter instance */ 
+  /* new interpreter instance */
   mrb = mrb_open();
   if (mrb == NULL) {
     fprintf(stderr, "Invalid mrb interpreter, exiting mirb");
@@ -163,8 +165,6 @@ main(void)
 
   cxt = mrbc_context_new(mrb);
   cxt->capture_errors = 1;
-  memset(ruby_code, 0, sizeof(*ruby_code));
-  memset(last_code_line, 0, sizeof(*last_code_line));
 
   while (TRUE) {
     print_cmdline(code_block_open);
@@ -197,8 +197,7 @@ main(void)
         strcat(ruby_code, last_code_line);
       }
       else {
-        memset(ruby_code, 0, sizeof(*ruby_code));
-        strcat(ruby_code, last_code_line);
+        strcpy(ruby_code, last_code_line);
       }
     }
 
@@ -208,7 +207,7 @@ main(void)
     parser->send = ruby_code + strlen(ruby_code);
     parser->lineno = 1;
     mrb_parser_parse(parser, cxt);
-    code_block_open = is_code_block_open(parser); 
+    code_block_open = is_code_block_open(parser);
 
     if (code_block_open) {
       /* no evaluation of code */
@@ -238,8 +237,8 @@ main(void)
 	  p(mrb, result);
 	}
       }
-      memset(ruby_code, 0, sizeof(*ruby_code));
-      memset(ruby_code, 0, sizeof(*last_code_line));
+      ruby_code[0] = '\0';
+      last_code_line[0] = '\0';
       mrb_parser_free(parser);
     }
   }

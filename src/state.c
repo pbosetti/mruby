@@ -16,10 +16,11 @@ void mrb_init_ext(mrb_state*);
 mrb_state*
 mrb_open_allocf(mrb_allocf f, void *ud)
 {
+  static const mrb_state mrb_state_zero = { 0 };
   mrb_state *mrb = (mrb_state *)(f)(NULL, NULL, sizeof(mrb_state), ud);
   if (mrb == NULL) return NULL;
 
-  memset(mrb, 0, sizeof(mrb_state));
+  *mrb = mrb_state_zero;
   mrb->ud = ud;
   mrb->allocf = f;
   mrb->current_white_part = MRB_GC_WHITE_A;
@@ -52,7 +53,7 @@ mrb_alloca(mrb_state *mrb, size_t size)
 {
   struct alloca_header *p;
 
-  p = mrb_malloc(mrb, sizeof(struct alloca_header)+size);
+  p = (struct alloca_header*) mrb_malloc(mrb, sizeof(struct alloca_header)+size);
   p->next = mrb->mems;
   mrb->mems = p;
   return (void*)p->buf;
@@ -92,13 +93,16 @@ mrb_close(mrb_state *mrb)
   mrb_free(mrb, mrb->stbase);
   mrb_free(mrb, mrb->cibase);
   for (i=0; i<mrb->irep_len; i++) {
-    mrb_free(mrb, mrb->irep[i]->iseq);
+    if (!(mrb->irep[i]->flags & MRB_ISEQ_NO_FREE))
+      mrb_free(mrb, mrb->irep[i]->iseq);
     mrb_free(mrb, mrb->irep[i]->pool);
     mrb_free(mrb, mrb->irep[i]->syms);
     mrb_free(mrb, mrb->irep[i]->lines);
     mrb_free(mrb, mrb->irep[i]);
   }
   mrb_free(mrb, mrb->irep);
+  mrb_free(mrb, mrb->rescue);
+  mrb_free(mrb, mrb->ensure);
   mrb_free_symtbl(mrb);
   mrb_free_heap(mrb);
   mrb_alloca_free(mrb);
@@ -116,12 +120,15 @@ mrb_add_irep(mrb_state *mrb, int idx)
     mrb->irep_capa = max;
   }
   else if (mrb->irep_capa <= idx) {
+    int i;
     size_t old_capa = mrb->irep_capa;
     while (mrb->irep_capa <= idx) {
       mrb->irep_capa *= 2;
     }
     mrb->irep = (mrb_irep **)mrb_realloc(mrb, mrb->irep, sizeof(mrb_irep*)*mrb->irep_capa);
-    memset(mrb->irep + old_capa, 0, sizeof(mrb_irep*) * (mrb->irep_capa - old_capa));
+    for (i = old_capa; i < mrb->irep_capa; i++) {
+      mrb->irep[i] = NULL;
+    }
   }
 }
 
